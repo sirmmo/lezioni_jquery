@@ -1,0 +1,136 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+            $(function(){
+                $(window).resize(do_resize);
+
+                $(window).scroll(function(event){
+                    let y = $(window)[0].pageYOffset;
+                    let val = '' +y+'px';
+                    console.log({'prova': 'dati a mano'});
+                    $('#blocco_verde').animate({left: val});
+                });
+
+                $('#menubtn').one('click', toggle_click);
+
+                $('#vnav button').click(function(){
+                    let target = $(this).data().scrollto;
+                    let offset = $('#'+target).offset().top;
+                    console.log(offset); 
+                    $('body').animate({
+                        scrollTop: offset
+                    })
+                });
+
+                do_resize();
+            });
+
+            function toggle_click() {
+                console.log('click');
+                $('#menu').show('fast', function(){
+                    $('#menu').one('mouseleave', function(){
+                        console.log('leave')
+                        $('#menu').hide(10000);
+                        $('#menubtn').one('click', toggle_click);
+                    });
+                });
+            }
+
+            function do_resize(){
+                let h = $(window).height();
+                let w = $(window).width();
+                $('#height').text(h);
+                $('#width').text(w);
+            }
+        </script>
+        <style>
+            body{
+                margin: 0
+            }
+            .screen {
+                height: 500px;
+                border: 1px solid green;
+            }
+            .block{
+                position:absolute;
+                width: 100px;
+                height: 100px;
+                background-color: darkkhaki;
+            }
+            .info{
+                display: none;
+            }
+            
+            #titolo{
+                background-image: url(https://images.unsplash.com/photo-1635284620384-cfa376aeaf60?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1543&q=80);
+                background-position: center center;
+                background-size: cover;
+                color:white;
+            }
+
+            ul#menu{
+                display: none;
+                position: absolute;
+                color: white;
+                background-color: #222;
+                padding: 10px;
+                border: 1px solid #777;
+                list-style-type: none;
+                top: 5px;
+            }
+            #vnav{
+                position: fixed;
+                right: 0;
+                top: 200px;
+                background-color:rgba(0,0,0,0.5);
+                height: 100px;
+                width: 25px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            #vnav button{
+                font-size: xx-small;
+                display: block;
+                text-align: center;
+                padding: 3px;
+                color: white;
+                flex: 1 1 10px;
+                background-color: transparent;
+                border:none;
+            }
+
+        </style>
+    </head>
+    <body>
+        <div class="info">
+            <span id="width"></span>
+            <span id="height"></span>
+        </div>
+        <nav>
+            <button id="menubtn"><i class="fas fa-bars"></i></button>
+            <ul id="menu">
+                <li>Introduzione</li>
+                <li>Caratteristiche</li>
+                <li>Testimonianze</li>
+            </ul>
+        </nav>
+        <nav id="vnav">
+            <button data-scrollto="titolo"><i class="fas fa-circle"></i></button>
+            <button data-scrollto="blocchi"><i class="fas fa-circle"></i></button>
+            <button data-scrollto="s1"><i class="fas fa-circle"></i></button>
+            <button data-scrollto="s2"><i class="fas fa-circle"></i></button>
+            <button data-scrollto="s3"><i class="fas fa-circle"></i></button>
+        </nav>
+        <div class="screen" id="titolo">
+            <h1>Storie</h1>
+        </div>
+        <div class="screen" id="blocchi">
+            <div class="block" id="blocco_verde"></div>
+        </div>
+        <div class="screen" id="s1"></div>
+        <div class="screen" id="s2"></div>
+        <div class="screen" id="s3"></div>
+    </body>
+</html>
