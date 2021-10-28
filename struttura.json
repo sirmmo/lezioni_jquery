@@ -4,21 +4,88 @@
         "id":"titolo",
         "background": "https://images.unsplash.com/photo-1635284620384-cfa376aeaf60?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1543&q=80",
         "color": "white",
-        "content": "<h1>Storie</h1>"
+        "content": {"type": "html" , "data": "<h1>Storie</h1>"}
     }, {
         "id":"blocchi",
-        "content": "<div>Testo di prova</div>",
+        "content": {"type": "html" , "data": "<div>Testo di prova</div>"},
         "background": "https://images.unsplash.com/photo-1635371854719-bcb6871917f2?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80",
         "color": "white"
     },{
-        "id": "s1"
+        "id": "s1",
+        "content": {
+            "type": "echarts",
+            "data": {
+                "dataset": {
+                  "source": [
+                    ["score", "amount", "product"],
+                    [89.3, 58212, "Matcha Latte"],
+                    [57.1, 78254, "Milk Tea"],
+                    [74.4, 41032, "Cheese Cocoa"],
+                    [50.1, 12755, "Cheese Brownie"],
+                    [89.7, 20145, "Matcha Cocoa"],
+                    [68.1, 79146, "Tea"],
+                    [19.6, 91852, "Orange Juice"],
+                    [10.6, 101852, "Lemon Juice"],
+                    [32.7, 20112, "Walnut Brownie"]
+                  ]
+                },
+                "grid": { "containLabel": true },
+                "xAxis": { "name": "amount" },
+                "yAxis": { "type": "category" },
+                "visualMap": {
+                  "orient": "horizontal",
+                  "left": "center",
+                  "min": 10,
+                  "max": 100,
+                  "text": ["High Score", "Low Score"],
+                  "dimension": 0,
+                  "inRange": {
+                    "color": ["#65B581", "#FFCE34", "#FD665F"]
+                  }
+                },
+                "series": [
+                  {
+                    "type": "bar",
+                    "encode": {
+                      "x": "amount",
+                      "y": "product"
+                    }
+                  }
+                ]
+              }
+        }
     },{
         "id": "s2",
-        "content": "<div class='block' id='blocco_verde'></div>"
+        "content": {
+            "type": "html" , 
+            "data": "<div class='block' id='blocco_verde'></div>"
+        }
     },{
-        "id": "s3"
+        "id": "s3",
+        "content": {
+            "type": "echarts" , 
+            "data": {
+                "xAxis": {
+                    "type": "category",
+                    "data": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+                },
+                "yAxis": {
+                    "type": "value"
+                },
+                "series": [
+                    {
+                        "data": [150, 230, 224, 218, 135, 147, 260],
+                        "type": "line"
+                    }
+                ]
+            }
+        }
     }],
-    "vnav": true,
+    "vnav": {
+        "visible": true,
+        "main_color": "red",
+        "neighbors": "pink"
+    },
     "menu": [
         "Introduzione",
         "Caratteristiche",
