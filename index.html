@@ -1,56 +1,16 @@
 <html>
     <head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script>
-            $(function(){
-                $(window).resize(do_resize);
-
-                $(window).scroll(function(event){
-                    let y = $(window)[0].pageYOffset;
-                    let val = '' +y+'px';
-                    console.log({'prova': 'dati a mano'});
-                    $('#blocco_verde').animate({left: val});
-                });
-
-                $('#menubtn').one('click', toggle_click);
-
-                $('#vnav button').click(function(){
-                    let target = $(this).data().scrollto;
-                    let offset = $('#'+target).offset().top;
-                    console.log(offset); 
-                    $('body').animate({
-                        scrollTop: offset
-                    })
-                });
-
-                do_resize();
-            });
-
-            function toggle_click() {
-                console.log('click');
-                $('#menu').show('fast', function(){
-                    $('#menu').one('mouseleave', function(){
-                        console.log('leave')
-                        $('#menu').hide(10000);
-                        $('#menubtn').one('click', toggle_click);
-                    });
-                });
-            }
-
-            function do_resize(){
-                let h = $(window).height();
-                let w = $(window).width();
-                $('#height').text(h);
-                $('#width').text(w);
-            }
-        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.2.1/echarts.min.js" integrity="sha512-17GGcT5BjSbaXG+4Fk3Z1HS1ATXH5oEH060GS3WvSEqGGpkSbRV/amkIWpqOJOIwkBW13QMOBblj8DXnlN7bEA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <style>
             body{
                 margin: 0
             }
             .screen {
                 height: 500px;
-                border: 1px solid green;
+                border: 1px solid green;     
+                background-position: center center;
+                background-size: cover;
             }
             .block{
                 position:absolute;
@@ -60,13 +20,6 @@
             }
             .info{
                 display: none;
-            }
-            
-            #titolo{
-                background-image: url(https://images.unsplash.com/photo-1635284620384-cfa376aeaf60?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1543&q=80);
-                background-position: center center;
-                background-size: cover;
-                color:white;
             }
 
             ul#menu{
@@ -82,12 +35,13 @@
             #vnav{
                 position: fixed;
                 right: 0;
-                top: 200px;
+                top: 100px;
                 background-color:rgba(0,0,0,0.5);
-                height: 100px;
+                height: 200px;
                 width: 25px;
                 display: flex;
                 flex-direction: column;
+                z-index: 1000000000;
             }
 
             #vnav button{
@@ -100,13 +54,240 @@
                 background-color: transparent;
                 border:none;
             }
+            .hidden{
+                display: none;
+            }
+
+            .centered{
+                text-align:center;
+            }
 
         </style>
+        <script>
+            const conf = {
+                "title": "Storie",
+                "screens": [{
+                    "id":"titolo",
+                    "background": "https://images.unsplash.com/photo-1635284620384-cfa376aeaf60?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1543&q=80",
+                    "color": "white",
+                    "content": {"type": "html" , "data": "<h1>Storie</h1>"}
+                }, {
+                    "id":"blocchi",
+                    "content": {"type": "html" , "data": "<div>Testo di prova</div>"},
+                    "background": "https://images.unsplash.com/photo-1635371854719-bcb6871917f2?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80",
+                    "color": "white"
+                },{
+                    "id": "s1",
+                    "content": {
+                        "type": "echarts",
+                        "data": {
+                            "dataset": {
+                              "source": [
+                                ["score", "amount", "product"],
+                                [89.3, 58212, "Matcha Latte"],
+                                [57.1, 78254, "Milk Tea"],
+                                [74.4, 41032, "Cheese Cocoa"],
+                                [50.1, 12755, "Cheese Brownie"],
+                                [89.7, 20145, "Matcha Cocoa"],
+                                [68.1, 79146, "Tea"],
+                                [19.6, 91852, "Orange Juice"],
+                                [10.6, 101852, "Lemon Juice"],
+                                [32.7, 20112, "Walnut Brownie"]
+                              ]
+                            },
+                            "grid": { "containLabel": true },
+                            "xAxis": { "name": "amount" },
+                            "yAxis": { "type": "category" },
+                            "visualMap": {
+                              "orient": "horizontal",
+                              "left": "center",
+                              "min": 10,
+                              "max": 100,
+                              "text": ["High Score", "Low Score"],
+                              "dimension": 0,
+                              "inRange": {
+                                "color": ["#65B581", "#FFCE34", "#FD665F"]
+                              }
+                            },
+                            "series": [
+                              {
+                                "type": "bar",
+                                "encode": {
+                                  "x": "amount",
+                                  "y": "product"
+                                }
+                              }
+                            ]
+                          }
+                    }
+                },{
+                    "id": "s2",
+                    "content": {
+                        "type": "html" , 
+                        "data": "<div class='block' id='blocco_verde'></div>"
+                    }
+                },{
+                    "id": "s3",
+                    "content": {
+                        "type": "echarts" , 
+                        "data": {
+                            "xAxis": {
+                                "type": "category",
+                                "data": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+                            },
+                            "yAxis": {
+                                "type": "value"
+                            },
+                            "series": [
+                                {
+                                    "data": [150, 230, 224, 218, 135, 147, 260],
+                                    "type": "line"
+                                }
+                            ]
+                        }
+                    }
+                }],
+                "vnav": {
+                    "visible": true,
+                    "main_color": "red",
+                    "neighbors": "pink"
+                },
+                "menu": [
+                    "Introduzione",
+                    "Caratteristiche",
+                    "Testimonianze"
+                ]
+            }
+            
+            
+            
+            $(function(){
+                $(window).resize(do_resize);
+                //$.getJSON('https://raw.githubusercontent.com/sirmmo/lezioni_jquery/1f44a286b31d45fba4ea0c0240539c5bcf7e48f0/struttura.json', function(data){
+                    init_dom(conf);
+                    $('.screen').each(function(index, element) {
+                        aggiungi_bottone(element);
+                    });
+                //});
+
+                $(window).scroll(function(event){
+                    let y = $(window)[0].pageYOffset;
+                    let val = '' +y+'px';
+                    let id = '';
+                    //$('#blocco_verde').animate({left: val});
+                    $('.screen').each((i, el) => {
+                        const off = $(el).offset().top;
+                        if(off < y){
+                            id = $(el).attr('id');
+                        } else {
+                            return false;
+                        }
+                    });
+                    $('#vnav button').css({'color': 'white'});
+                    $('#vnav button').each((i,el) =>{
+                        const btn = $(el);
+                        if(btn.data().scrollto === id){
+                            $(el).css({'color': $('#vnav').data().main_color});
+                            $(el).next().css({'color': $('#vnav').data().neighbors});
+                            $(el).prev().css({'color': $('#vnav').data().neighbors});
+                        }
+                    })
+                });
+
+                $('#menubtn').one('click', toggle_click);
+
+
+                $('#vnav').on('click', 'button',function(){
+                    let target = $(this).data().scrollto;
+                    let offset = $('#'+target).offset().top;
+                    $('body').animate({
+                        scrollTop: offset
+                    });
+                    $('#vnav button').css({'color': 'white'});
+                    $(this).css({'color':$('#vnav').data().main_color});
+                    $(this).next().css({'color': $('#vnav').data().neighbors});
+                    $(this).prev().css({'color': $('#vnav').data().neighbors});
+                });
+
+                $('#addscreen').click(function(){
+                    const id = prompt('Inserire ID');
+                    const nuovo = $('<div></div>');
+
+                    nuovo.addClass('screen');
+                    nuovo.attr('id', id);
+
+                    $('.screen').last().after(nuovo);
+                    aggiungi_bottone(nuovo);
+
+                });
+
+                do_resize();
+            });
+
+            function init_dom(config){
+                document.title = config.title;
+                if (!config.vnav.visible) {
+                    $('#vnav').hide();
+                } else {
+                    $('#vnav').data('main_color', conf.vnav.main_color);
+                    $('#vnav').data('neighbors', conf.vnav.neighbors);
+                }
+
+                for (let screen of config.screens){
+                    const nuovo = $('<div></div>');
+                    nuovo.addClass('screen');
+                    nuovo.attr('id', screen.id);
+                    nuovo.css('color', screen.color);
+                    $('#editor').before(nuovo);
+                    if (screen.background)
+                        nuovo.css('background-image','url('+screen.background+')');
+                    if (screen.content){
+                        switch(screen.content.type){
+                        case 'html':
+                            nuovo.append($(screen.content.data));
+                            break;
+                        case 'echarts':
+                            var chartDom = document.getElementById(screen.id);
+                            var myChart = echarts.init(chartDom);
+                            myChart.setOption(screen.content.data);
+                        }
+                    }
+                }
+            }
+
+            function aggiungi_bottone(element){
+                const el = $(element);
+                let bottone = $('.hidden .navbutton').clone();
+                bottone.removeClass('navbutton');
+                bottone.attr('title', el.attr('id'));
+                bottone.data('scrollto', el.attr('id'));
+                $('#vnav').append(bottone);
+            }
+
+            function toggle_click() {
+                $('#menu').show('fast', function(){
+                    $('#menu').one('mouseleave', function(){
+                        $('#menu').hide(10000);
+                        $('#menubtn').one('click', toggle_click);
+                    });
+                });
+            }
+
+            function do_resize(){
+                let h = $(window).height();
+                let w = $(window).width();
+                $('#height').text(h);
+                $('#width').text(w);
+            }
+        </script>
     </head>
     <body>
         <div class="info">
             <span id="width"></span>
             <span id="height"></span>
+        </div>
+        <div class="hidden">
+            <button class="navbutton" data-scrollto="s3"><i class="fas fa-circle"></i></button>
         </div>
         <nav>
             <button id="menubtn"><i class="fas fa-bars"></i></button>
@@ -116,21 +297,11 @@
                 <li>Testimonianze</li>
             </ul>
         </nav>
-        <nav id="vnav">
-            <button data-scrollto="titolo"><i class="fas fa-circle"></i></button>
-            <button data-scrollto="blocchi"><i class="fas fa-circle"></i></button>
-            <button data-scrollto="s1"><i class="fas fa-circle"></i></button>
-            <button data-scrollto="s2"><i class="fas fa-circle"></i></button>
-            <button data-scrollto="s3"><i class="fas fa-circle"></i></button>
+        <nav id="vnav"></nav>
+        <nav id="editor" class="centered">
+            <button id="addscreen">+</button>
+            <button id="export">esporta</button>
+            <button id="import">importa</button>
         </nav>
-        <div class="screen" id="titolo">
-            <h1>Storie</h1>
-        </div>
-        <div class="screen" id="blocchi">
-            <div class="block" id="blocco_verde"></div>
-        </div>
-        <div class="screen" id="s1"></div>
-        <div class="screen" id="s2"></div>
-        <div class="screen" id="s3"></div>
     </body>
 </html>
