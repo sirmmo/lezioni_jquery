@@ -86,6 +86,12 @@
             "type": "list",
             "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson"
         }
+    }, {
+        "id": "load",
+        "content": {
+            "type": "load",
+            "url": "https://filesamples.com/samples/document/txt/sample3.txt"
+        }
     }],
     "vnav": {
         "visible": true,
