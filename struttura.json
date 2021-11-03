@@ -90,7 +90,7 @@
         "id": "load",
         "content": {
             "type": "load",
-            "url": "https://filesamples.com/samples/document/txt/sample3.txt"
+            "url": "https://raw.githubusercontent.com/sirmmo/lezioni_jquery/main/LICENSE"
         }
     }],
     "vnav": {
