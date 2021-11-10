@@ -88,6 +88,12 @@
         }
     }, {
         "id": "load",
+        "content": {
+            "type": "load",
+            "url": "https://raw.githubusercontent.com/sirmmo/lezioni_jquery/main/LICENSE"
+        }
+    }, {
+        "id": "load_2",
         "content":{
             "type": "load",
             "url": "http://51.15.160.236:9935/info.json"

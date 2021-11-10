@@ -1,6 +1,7 @@
 <html>
     <head>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />        
         <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.2.1/echarts.min.js" integrity="sha512-17GGcT5BjSbaXG+4Fk3Z1HS1ATXH5oEH060GS3WvSEqGGpkSbRV/amkIWpqOJOIwkBW13QMOBblj8DXnlN7bEA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <style>
             body{
@@ -62,113 +63,23 @@
                 text-align:center;
             }
 
+            #form {
+                display: flex;
+                flex-direction: row;
+            }
+
         </style>
         <script>
-            const conf = {
-                "title": "Storie",
-                "screens": [{
-                    "id":"titolo",
-                    "background": "https://images.unsplash.com/photo-1635284620384-cfa376aeaf60?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1543&q=80",
-                    "color": "white",
-                    "content": {"type": "html" , "data": "<h1>Storie</h1>"}
-                }, {
-                    "id":"blocchi",
-                    "content": {"type": "html" , "data": "<div>Testo di prova</div>"},
-                    "background": "https://images.unsplash.com/photo-1635371854719-bcb6871917f2?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80",
-                    "color": "white"
-                },{
-                    "id": "s1",
-                    "content": {
-                        "type": "echarts",
-                        "data": {
-                            "dataset": {
-                              "source": [
-                                ["score", "amount", "product"],
-                                [89.3, 58212, "Matcha Latte"],
-                                [57.1, 78254, "Milk Tea"],
-                                [74.4, 41032, "Cheese Cocoa"],
-                                [50.1, 12755, "Cheese Brownie"],
-                                [89.7, 20145, "Matcha Cocoa"],
-                                [68.1, 79146, "Tea"],
-                                [19.6, 91852, "Orange Juice"],
-                                [10.6, 101852, "Lemon Juice"],
-                                [32.7, 20112, "Walnut Brownie"]
-                              ]
-                            },
-                            "grid": { "containLabel": true },
-                            "xAxis": { "name": "amount" },
-                            "yAxis": { "type": "category" },
-                            "visualMap": {
-                              "orient": "horizontal",
-                              "left": "center",
-                              "min": 10,
-                              "max": 100,
-                              "text": ["High Score", "Low Score"],
-                              "dimension": 0,
-                              "inRange": {
-                                "color": ["#65B581", "#FFCE34", "#FD665F"]
-                              }
-                            },
-                            "series": [
-                              {
-                                "type": "bar",
-                                "encode": {
-                                  "x": "amount",
-                                  "y": "product"
-                                }
-                              }
-                            ]
-                          }
-                    }
-                },{
-                    "id": "s2",
-                    "content": {
-                        "type": "html" , 
-                        "data": "<div class='block' id='blocco_verde'></div>"
-                    }
-                },{
-                    "id": "s3",
-                    "content": {
-                        "type": "echarts" , 
-                        "data": {
-                            "xAxis": {
-                                "type": "category",
-                                "data": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-                            },
-                            "yAxis": {
-                                "type": "value"
-                            },
-                            "series": [
-                                {
-                                    "data": [150, 230, 224, 218, 135, 147, 260],
-                                    "type": "line"
-                                }
-                            ]
-                        }
-                    }
-                }],
-                "vnav": {
-                    "visible": true,
-                    "main_color": "red",
-                    "neighbors": "pink"
-                },
-                "menu": [
-                    "Introduzione",
-                    "Caratteristiche",
-                    "Testimonianze"
-                ]
-            }
-            
             
             
             $(function(){
                 $(window).resize(do_resize);
-                //$.getJSON('https://raw.githubusercontent.com/sirmmo/lezioni_jquery/1f44a286b31d45fba4ea0c0240539c5bcf7e48f0/struttura.json', function(data){
-                    init_dom(conf);
+                $.getJSON('https://raw.githubusercontent.com/sirmmo/lezioni_jquery/254ce128fe990a2f451f95bc0ea235fff80d1a7a/struttura.json', function(data){
+                    init_dom(data);
                     $('.screen').each(function(index, element) {
                         aggiungi_bottone(element);
                     });
-                //});
+                });
 
                 $(window).scroll(function(event){
                     let y = $(window)[0].pageYOffset;
@@ -221,6 +132,20 @@
 
                 });
 
+                $('#send').click(function(){
+                    let fr = $('#from').val();
+                    $.ajax({
+                        url: 'http://51.15.160.236:9935/modifica',
+                        method: 'POST',
+                        dataType: 'json',
+                        contentType: 'application/json',
+                        data: fr, 
+                        success: function(data){
+                            $('#to').val(JSON.stringify(data));                   
+                        }
+                    });
+                });
+
                 do_resize();
             });
 
@@ -229,8 +154,8 @@
                 if (!config.vnav.visible) {
                     $('#vnav').hide();
                 } else {
-                    $('#vnav').data('main_color', conf.vnav.main_color);
-                    $('#vnav').data('neighbors', conf.vnav.neighbors);
+                    $('#vnav').data('main_color', config.vnav.main_color);
+                    $('#vnav').data('neighbors', config.vnav.neighbors);
                 }
 
                 for (let screen of config.screens){
@@ -250,6 +175,16 @@
                             var chartDom = document.getElementById(screen.id);
                             var myChart = echarts.init(chartDom);
                             myChart.setOption(screen.content.data);
+                            break;
+                        case 'list':
+                            $.getJSON(screen.content.url, function(list_data){
+                                for(let feature of list_data.features){
+                                    nuovo.append(feature.properties.title);
+                                }
+                            });
+                            break;
+                        case 'load':
+                            nuovo.load(screen.content.url);
                         }
                     }
                 }
@@ -278,7 +213,7 @@
                 let w = $(window).width();
                 $('#height').text(h);
                 $('#width').text(w);
-            }
+            }+
         </script>
     </head>
     <body>
@@ -298,6 +233,17 @@
             </ul>
         </nav>
         <nav id="vnav"></nav>
+        <div id="form">
+            <div id="f1">
+                <textarea id="from"></textarea>
+            </div>
+            <div id="op">
+                <button id="send">>></button>
+            </div>
+            <div id="f2">
+                <textarea id="to"></textarea>
+            </div>
+        </div>
         <nav id="editor" class="centered">
             <button id="addscreen">+</button>
             <button id="export">esporta</button>

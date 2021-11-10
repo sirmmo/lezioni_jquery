@@ -1,0 +1,92 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />        
+
+        <style>
+            body{
+                margin: 0;
+                font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            }
+            #nav{
+                background-color: #323;
+                color:white;
+                padding: 20px;
+            }
+
+            #nav button{
+                background-color: transparent;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+            #content{
+                z-index: 500;
+                position: relative;
+            }
+            #sidebar{
+                position:absolute;
+                width: 200px;
+                left: 0;
+                min-height: calc(100vh - 60px);
+                border-right: 1px solid grey;
+                background-color: #656;
+            }
+            table{
+                border: 1px solid gray;
+            }
+            table td{
+                width:150px;
+                border: 0.5px solid lightblue;
+            }
+        </style>
+        <script>
+            $(function(){
+                $('#toggle_side').click(function(){
+                    const hidden = $('#sidebar').data('hidden');
+                    if (!hidden){
+                        $('#sidebar').animate({
+                            "left" : "-200px"
+                        }, function(){
+                            $('#sidebar').hide()
+                            $('#sidebar').data('hidden', true);
+                        });
+                    } else {
+                        $('#sidebar').show();
+                        $('#sidebar').animate({
+                            "left" : "0px"
+                        }, function(){
+                            $('#sidebar').data('hidden', false);
+                        });
+                    }
+                })
+            });
+        </script>
+    </head>
+    <body>
+        <nav id="nav">
+            <button id="toggle_side"><i class="fas fa-bars"></i></button>
+            Azienda - admin</nav>
+        <div id="content">
+            <aside id="sidebar">
+                PROBLEMA GRAVE
+            </aside>
+            <div id="main">
+                <table cellspacing="0">
+                    <tr>
+                        <th></th>
+                        <th>Col1</th>
+                        <th>Col2</th>
+                        <th>Col3</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Val1.1</td>
+                        <td>Val1.2</td>
+                        <td>Val1.3</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>
