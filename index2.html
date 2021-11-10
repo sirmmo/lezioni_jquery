@@ -1,8 +1,10 @@
 <html>
     <head>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />        
-
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.2.1/echarts.min.js" integrity="sha512-17GGcT5BjSbaXG+4Fk3Z1HS1ATXH5oEH060GS3WvSEqGGpkSbRV/amkIWpqOJOIwkBW13QMOBblj8DXnlN7bEA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.0/mapbox-gl.css" rel="stylesheet">
+        <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.0/mapbox-gl.js"></script>
         <style>
             body{
                 margin: 0;
@@ -28,9 +30,20 @@
                 position:absolute;
                 width: 200px;
                 left: 0;
+                top: 0;
                 min-height: calc(100vh - 60px);
                 border-right: 1px solid grey;
                 background-color: #656;
+                z-index: 1000;
+                color: white;
+            }
+            #page{
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: 100;
+                width: 100%;
+                height: calc(100vh - 58px);
             }
             table{
                 border: 1px solid gray;
@@ -39,8 +52,147 @@
                 width:150px;
                 border: 0.5px solid lightblue;
             }
+
+            .clickable{
+                cursor: pointer;
+            }
+
+            .hidden{                
+                width: 100%;
+                height: calc(100vh - 58px);
+            }
+            #map {
+                width: 100%;
+                height: calc(100vh - 58px);
+            }
         </style>
         <script>
+            var conf = {
+                "title": "App",
+                "start":"s1",
+                "pages": [{
+                    "id": "quakes_map",
+                    "content":{
+                        "type": "map",
+                        "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
+                    }
+                }, {
+                    "id":"titolo",
+                    "label": "Titolo",
+                    "icon": "home",
+                    "background": "https://images.unsplash.com/photo-1635284620384-cfa376aeaf60?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1543&q=80",
+                    "color": "white",
+                    "content": {"type": "html" , "data": "<h1>Storie</h1>"}
+                }, {
+                    "id":"blocchi",
+                    "label": "Blocchi",
+                    "icon": "box",
+                    "content": {"type": "html" , "data": "<div>Testo di prova</div>"},
+                    "background": "https://images.unsplash.com/photo-1635371854719-bcb6871917f2?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1470&q=80",
+                    "color": "white"
+                },{
+                    "id": "s1",
+                    "label": "Charts",
+                    "content": {
+                        "type": "echarts",
+                        "data": {
+                            "dataset": {
+                              "source": [
+                                ["score", "amount", "product"],
+                                [89.3, 58212, "Matcha Latte"],
+                                [57.1, 78254, "Milk Tea"],
+                                [74.4, 41032, "Cheese Cocoa"],
+                                [50.1, 12755, "Cheese Brownie"],
+                                [89.7, 20145, "Matcha Cocoa"],
+                                [68.1, 79146, "Tea"],
+                                [19.6, 91852, "Orange Juice"],
+                                [10.6, 101852, "Lemon Juice"],
+                                [32.7, 20112, "Walnut Brownie"]
+                              ]
+                            },
+                            "grid": { "containLabel": true },
+                            "xAxis": { "name": "amount" },
+                            "yAxis": { "type": "category" },
+                            "visualMap": {
+                              "orient": "horizontal",
+                              "left": "center",
+                              "min": 10,
+                              "max": 100,
+                              "text": ["High Score", "Low Score"],
+                              "dimension": 0,
+                              "inRange": {
+                                "color": ["#65B581", "#FFCE34", "#FD665F"]
+                              }
+                            },
+                            "series": [
+                              {
+                                "type": "bar",
+                                "encode": {
+                                  "x": "amount",
+                                  "y": "product"
+                                }
+                              }
+                            ]
+                          }
+                    }
+                },{
+                    "id": "t2",
+                    "content": {
+                        "type": "html" , 
+                        "data": "<div class='block' id='blocco_verde'></div>"
+                    }
+                },{
+                    "id": "s3",
+                    "content": {
+                        "type": "echarts" , 
+                        "data": {
+                            "xAxis": {
+                                "type": "category",
+                                "data": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+                            },
+                            "yAxis": {
+                                "type": "value"
+                            },
+                            "series": [
+                                {
+                                    "data": [150, 230, 224, 218, 135, 147, 260],
+                                    "type": "line"
+                                }
+                            ]
+                        }
+                    }
+                }, {
+                    "id": "quakes",
+                    "content":{
+                        "type": "list",
+                        "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_hour.geojson"
+                    }
+                }, {
+                    "id": "load",
+                    "content": {
+                        "type": "load",
+                        "url": "https://raw.githubusercontent.com/sirmmo/lezioni_jquery/main/LICENSE"
+                    }
+                }, {
+                    "id": "load_2",
+                    "content":{
+                        "type": "load",
+                        "url": "http://51.15.160.236:9935/info.json"
+                    }
+                }],
+                "vnav": {
+                    "visible": true,
+                    "main_color": "red",
+                    "neighbors": "pink"
+                },
+                "menu": [
+                    "Introduzione",
+                    "Caratteristiche",
+                    "Testimonianze"
+                ]
+            }
+            mapboxgl.accessToken = 'pk.eyJ1IjoibWVuc2FpdGFsaWEiLCJhIjoiY2t1am95ODRyMGx4eDJwcDY2dHFyNTZuYiJ9.D-nZs3WM-lcYr9sf4hEIzg';
+
             $(function(){
                 $('#toggle_side').click(function(){
                     const hidden = $('#sidebar').data('hidden');
@@ -59,33 +211,140 @@
                             $('#sidebar').data('hidden', false);
                         });
                     }
-                })
+                });
+                init_page(conf);
+                $('.clickable').click(function(){
+                    window.location.hash='#'+$(this).data('target');
+                });
+                if (!window.location.hash){
+                    window.location.hash = '#'+conf.start;
+                }
+                onHashChange();
             });
+
+            function init_page(conf){
+                for(let page of conf.pages){
+                    aggiungi_bottone(page);
+                }
+            }
+
+            function mostra_pagina(screen){
+                $('#page').empty();
+                const nuovo = $('<div></div>');
+                nuovo.addClass('hidden');
+                nuovo.attr('id', screen.id);
+                nuovo.css('color', screen.color);
+                $('#page').append(nuovo);
+                if (screen.background)
+                    nuovo.css('background-image','url('+screen.background+')');
+                if (screen.content){
+                    switch(screen.content.type){
+                    case 'html':
+                        nuovo.append($(screen.content.data));
+                        break;
+                    case 'echarts':
+                        var chartDom = document.getElementById(screen.id);
+                        var myChart = echarts.init(chartDom);
+                        myChart.setOption(screen.content.data);
+                        break;
+                    case 'list':
+                        $.getJSON(screen.content.url, function(list_data){
+                            for(let feature of list_data.features){
+                                nuovo.append(feature.properties.title);
+                            }
+                        });
+                        break;
+                    case 'load':
+                        nuovo.load(screen.content.url);
+                        break;
+                    case 'map':
+                        const mapc = $('<div id="map"></div>');
+                        nuovo.append(mapc);
+                        const map = new mapboxgl.Map({
+                            container: 'map', // container ID
+                            style: 'mapbox://styles/mapbox/streets-v11', // style URL
+                            center: [11.342778, 44.493889], // starting position [lng, lat]
+                            zoom: 13 // starting zoom
+                        });
+                        var target_addr = "https://www.google.com/maps/dir/{{nostre_coord}}/{{destinazione_coord}}/";
+                        var nostre_coord = "";
+                        navigator.geolocation.getCurrentPosition(position => {
+                            nostre_coord += position.coords.latitude + "," + position.coords.longitude;
+                        });
+                        map.on('load', () => {
+                            map.addSource('quakes', {
+                                'type': 'geojson',
+                                'data': screen.content.url
+                            })                         
+                            map.addLayer({
+                                'id': 'quakes',
+                                'type': 'circle',
+                                'source': 'quakes',
+                                'paint': {
+                                    'circle-radius': 6,
+                                    'circle-color': '#B42222'
+                                },
+                                'filter': ['==', '$type', 'Point']
+                            });
+                            map.on('click', 'quakes', (e) => {
+                                var dest_coord = "" + e.lngLat.lat + ',' + e.lngLat.lng;
+                                var url = target_addr
+                                    .replace('{{nostre_coord}}', nostre_coord)
+                                    .replace('{{destinazione_coord}}', dest_coord);
+                                window.open(url, 'direzioni');
+                            });
+                            
+
+
+                        });
+                    }
+                }
+            }
+
+            function aggiungi_bottone(page){
+                const btn = $('<div></div>');
+                const icon = $('<i class="fas fa-fw"></i>');
+                icon.addClass('fa-' + page.icon);
+                btn.append(icon);
+                btn.addClass('clickable');
+                const lbl = $('<span></span')
+                if (page.label)
+                    lbl.text(page.label);
+                else 
+                    lbl.text(page.id);
+                btn.append(lbl);
+                btn.data('target', page.id);
+                $('#sidebar').append(btn);
+            }
+
+            window.addEventListener('hashchange', onHashChange);
+
+            function onHashChange() {
+                
+                var selected_page = {};
+                for( let page of conf.pages){
+                    if(page.id === window.location.hash.replace('#', '')){
+                        selected_page = page;
+                        if (selected_page.label)
+                            $('#section').text(selected_page.label);
+                        else 
+                            $('#section').text(selected_page.id);
+                            
+                    }
+                }
+                mostra_pagina(selected_page);
+            }
         </script>
     </head>
     <body>
         <nav id="nav">
             <button id="toggle_side"><i class="fas fa-bars"></i></button>
-            Azienda - admin</nav>
+            Azienda - <span id="section">admin</span>
+        </nav>
         <div id="content">
             <aside id="sidebar">
-                PROBLEMA GRAVE
             </aside>
-            <div id="main">
-                <table cellspacing="0">
-                    <tr>
-                        <th></th>
-                        <th>Col1</th>
-                        <th>Col2</th>
-                        <th>Col3</th>
-                    </tr>
-                    <tr>
-                        <td>1</td>
-                        <td>Val1.1</td>
-                        <td>Val1.2</td>
-                        <td>Val1.3</td>
-                    </tr>
-                </table>
+            <div id="page">
             </div>
         </div>
     </body>
