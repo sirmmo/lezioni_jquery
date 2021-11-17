@@ -1,123 +1,158 @@
 <html>
-    <head>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />        
-        <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js" integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA=" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
-        <style>
-            nav {
-                height: 48px;
-                line-height: 48px;
-                vertical-align: center;
-                display: flex;
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"
+        integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    <style>
+        nav {
+            height: 48px;
+            line-height: 48px;
+            vertical-align: center;
+            display: flex;
+        }
+
+        nav .title {
+            font-size: larger;
+        }
+
+        nav button {
+            margin-top: 12px;
+            margin-left: 20px;
+            color: white;
+            border: none;
+            height: 24px;
+            font-size: x-small !important;
+        }
+    </style>
+    <script>
+        (function($) {
+        $.fn.tabellone = function(conf) {
+            var ddom = $('<div title="Aggiungi '+conf.item_name+'"/>')
+                .attr('data', conf.structure)
+                .append($('<p class="validateTips">All form fields are required.</p>'))
+                .append($('<form />').append($('<fieldset />')));
+            for (let s of conf.structure){
+                ddom.find('fieldset')
+                    .append($('<label />')
+                        .attr('for', s.name)
+                        .text(s.title))
+                    .append($('<input />')
+                        .attr('type', s.type)
+                        .attr('name', s.name)
+                        .addClass('ui-widget-content')
+                        .addClass('ui-corner-all'))
             }
-
-            nav .title{
-                font-size: larger;
-            }
-
-            nav button {
-                margin-top: 12px;
-                margin-left: 20px;
-                color: white;
-                border: none;
-                height: 24px;
-                font-size: x-small !important;
-            }
-
-        </style>
-        <script>
-            $(function(){
-                function aggiungiLibro(data){
-                    var riga = $('<tr></tr>');
-                    riga.append($('<td></td>').text(data.title));
-                    riga.append($('<td></td>').text(data.author));
-                    riga.append($('<td></td>').text(data.pages));
-                    $('tbody').append(riga);
-                }
-
-                $('button').button();
-                dialogs = {};
-                $('.dialog-form').each(function(i, el){
-                    dialogs[$(el).attr('id')] = $(el).dialog({
-                        autoOpen: false,
-                        height: 400,
-                        width: 350,
-                        modal: true,
-                        buttons: {
-                          "Aggiungi": function(){
-                              var data = {};
-                              for (let input of $(dialogs[$(el).attr('id')]).find('input')) {
-                                data[$(input).attr('name')] = $(input).val();
-                              }
-                              op = '' + $(el).data('func') + '(data)';
-                              console.log(op);
-                              eval('' + $(el).data('func') + '(data)');
-                              dialogs[$(el).attr('id')].dialog( "close" );
-                          },
-                          Annulla: function() {
-                            dialogs[$(el).attr('id')].dialog( "close" );
-                          }
-                        },
-                        close: function() {
-                          form[ 0 ].reset();
-                          allFields.removeClass( "ui-state-error" );
+            this.append(ddom);
+            dialog = ddom.dialog({
+                autoOpen: false,
+                height: 400,
+                width: 350,
+                modal: true,
+                buttons: {
+                    "Aggiungi": function () {
+                        var data = {};
+                        for (let input of $(dialog).find('input')) {
+                            data[$(input).attr('name')] = $(input).val();
                         }
-                      })
+                        aggiungi_item(data, $(dialog).find('.ui-dialog-content')[0].data('conf'));
+                        dialog.dialog("close");
+                    },
+                    Annulla: function () {
+                        dialog.dialog("close");
+                    }
+                },
+                close: function () {
+                    $(dialog).find('form')[0].reset();
+                    //allFields.removeClass("ui-state-error");
+                }
+            })
+
+            var nav = $('<nav />');
+            var btn = $('<button />')
+                .addClass('ui-button')
+                .addClass('add_button')
+                .data('dialog', dialog)
+                .attr('id', 'test')
+                .click(function () {
+                    $(this).data('dialog').dialog("open");
                 })
-                  $('.add_button').click(function(){
-                    dialogs[$(this).data('dialog')].dialog( "open" );
-                  })
+            btn.append($('<i class="fas fa-fw fa-plus"></i>'));
+            btn.append($('<span/>').text(conf.item_name))
+            nav.append(btn);
+            this.append(nav);
+
+            var table = $('<table class="ui-widget ui-widget-content" />');
+            var thead = $('<thead />').append('<tr />');
+            for (let s of conf.structure){
+                thead.find('tr').append($('<th />').text(s.title));
+            }
+            table.append(thead);
+            table.append($('<tbody />'));
+            this.append(table);
+            function aggiungi_item(data, structure) {
+                var riga = $('<tr></tr>');
+                for (let s of structure){
+                    riga.append($('<td></td>').text(data[s.name]));
+                }
+                table.find('tbody').append(riga);
+            }
+        };
+    } (jQuery));
+
+        $(function () {
+            
+            $( "#tabs" ).tabs();
+
+            $('button').button();
+
+            $('#tab-libri').tabellone({
+                item_name: "Libro",
+                structure: [
+                    {name: "title", title: "Titolo", type: "text"},
+                    {name: "author", title: "Autore", type: "text"},
+                    {name: "pages", title: "Pagine", type: "number"}
+                ]
             });
-        </script>
-    </head>
-    <body>
-        <nav>
-            <span class="title">Archivio Libri</span>
-            <button class="ui-button add_button" data-dialog="book_dialog" id="add_book"><i class="fas fa-fw fa-plus"></i> Libro</button>
-            <button class="ui-button add_button" data-dialog="auth_dialog" id="add_auth"><i class="fas fa-fw fa-plus"></i> Autore</button>
-        </nav>
+            $('#tab-auths').tabellone({
+                item_name: "Autore",
+                structure: [
+                    {name: "name", title: "Nome", type: "text"},
+                    {name: "date", title: "Data di nascita", type: "date"}
+                ]
+            });
 
-        <div id="content">
-            <table class="ui-widget ui-widget-content">
-                <thead>
-                    <tr>
-                        <th>Libro</th><th>Autore</th><th>Pagine</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            $('#tab-editors').tabellone({
+                item_name: "Editore",
+                structure: [
+                    {name: "name", title: "Nome", type: "text"},
+                    {name: "city", title: "Città", type: "string"}
+                ]
+            });
+        });
+
+    </script>
+</head>
+
+<body>
+    <nav><span class="title">Archivio Libri</span></nav>
+    <div id="content">
+        <div id="tabs">
+            <ul>
+                <li><a href="#tab-libri">Libri</a></li>
+                <li><a href="#tab-auths">Autori</a></li>
+                <li><a href="#tab-editors">Editori</a></li>
+            </ul>
+            <div id="tab-libri"></div>
+            <div id="tab-auths"></div>
+            <div id="tab-editors"></div>
         </div>
+    </div>
 
-         
-<div class="dialog-form" id="book_dialog" title="Aggiungi Libro" data-func="aggiungiLibro">
-    <p class="validateTips">All form fields are required.</p>
-   
-    <form>
-      <fieldset>
-        <label for="title">Titolo</label>
-        <input type="text" name="title" value="Jane Smith" class="text ui-widget-content ui-corner-all">
-        <label for="author">Autore</label>
-        <input type="text" name="author" value="jane@smith.com" class="text ui-widget-content ui-corner-all">
-        <label for="pages">Pagine</label>
-        <input type="number" name="pages" class="text ui-widget-content ui-corner-all">
-      </fieldset>
-    </form>
-  </div>
+</body>
 
-  <div class="dialog-form" id="auth_dialog" title="Aggiungi Autrice/Autore"  data-func="aggiungiAuth">
-    <p class="validateTips">All form fields are required.</p>
-   
-    <form>
-      <fieldset>
-        <label for="name">Nome</label>
-        <input type="text" name="name" value="Jane Smith" class="text ui-widget-content ui-corner-all">
-        <label for="date">Data Nascita</label>
-        <input type="date" name="date" value="jane@smith.com" class="text ui-widget-content ui-corner-all">
-      </fieldset>
-    </form>
-  </div>
-
-
-    </body>
 </html>
