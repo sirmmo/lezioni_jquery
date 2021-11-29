@@ -37,15 +37,18 @@
                 .append($('<p class="validateTips">All form fields are required.</p>'))
                 .append($('<form />').append($('<fieldset />')));
             for (let s of conf.structure){
-                ddom.find('fieldset')
-                    .append($('<label />')
-                        .attr('for', s.name)
-                        .text(s.title))
-                    .append($('<input />')
-                        .attr('type', s.type)
-                        .attr('name', s.name)
-                        .addClass('ui-widget-content')
-                        .addClass('ui-corner-all'))
+                if(s.type !== 'hidden'){
+                    ddom.find('fieldset')
+                        .append($('<label />')
+                            .attr('for', s.name)
+                            .text(s.title))
+                        .append($('<input />')
+                            .attr('type', s.type)
+                            .attr('name', s.name)
+                            .addClass('ui-widget-content')
+                            .addClass('ui-corner-all'))
+                        .append($('<br />'))
+                }
             }
             this.append(ddom);
             dialog = ddom.dialog({
@@ -55,15 +58,30 @@
                 modal: true,
                 buttons: {
                     "Aggiungi": function () {
+                        console.log(conf.structure);
                         var data = {};
-                        for (let input of $(dialog).find('input')) {
-                            data[$(input).attr('name')] = $(input).val();
+                        for (let field of conf.structure) {
+                            let input = $(this).find('[name="'+field.name+'"]');
+                            data[field.name] = $(input[0]).val();
                         }
-                        aggiungi_item(data, $(dialog).find('.ui-dialog-content')[0].data('conf'));
-                        dialog.dialog("close");
+                        if(conf.endpoint){
+                            $.ajax({
+                                method: 'POST',
+                                dataType: 'json',
+                                contentType: 'application/json',
+                                url: conf.endpoint,
+                                data: JSON.stringify(data)
+                            }).done(function(){
+                                aggiorna_lista();
+                                $(this).dialog("close");
+                            });
+                        } else {
+                            aggiungi_item(data, conf.structure);
+                            $(this).dialog("close");
+                        }
                     },
                     Annulla: function () {
-                        dialog.dialog("close");
+                        $(this).dialog("close");
                     }
                 },
                 close: function () {
@@ -77,7 +95,7 @@
                 .addClass('ui-button')
                 .addClass('add_button')
                 .data('dialog', dialog)
-                .attr('id', 'test')
+                .attr('id', 'add_'+conf.item_name.replace(' ', '_'))
                 .click(function () {
                     $(this).data('dialog').dialog("open");
                 })
@@ -89,34 +107,77 @@
             var table = $('<table class="ui-widget ui-widget-content" />');
             var thead = $('<thead />').append('<tr />');
             for (let s of conf.structure){
-                thead.find('tr').append($('<th />').text(s.title));
+                if(s.type !== 'hidden')
+                    thead.find('tr').append($('<th />').text(s.title));
             }
+            thead.find('tr').append($('<th />').text("Azioni"));
             table.append(thead);
             table.append($('<tbody />'));
             this.append(table);
+            function aggiorna_lista(){
+                    table.find('tbody').empty();
+                    $.ajax({
+                        method: 'get',
+                        dataType: 'json',
+                        url: conf.endpoint,
+                        success: function (data){
+                            console.log(data);
+                            for(let libro of data){
+                                aggiungi_item(libro, conf.structure)
+                            }
+                        },
+                        error: function(data, status, error) {
+                            console.log(data);
+                            console.log(status, error);
+                        }
+                    })
+                
+            }
+            
+            aggiorna_lista();
+            
             function aggiungi_item(data, structure) {
                 var riga = $('<tr></tr>');
+                let identifier = null;
                 for (let s of structure){
-                    riga.append($('<td></td>').text(data[s.name]));
+                    if (s.type !== 'hidden')
+                        riga.append($('<td></td>').text(data[s.name]));
+                    else 
+                        identifier = s.name;
                 }
+                riga.append($('<td></td>').append(
+                    $('<button class="ui-button">Cancella</button>').click(function(){
+                        $.ajax({
+                            method: 'DELETE',
+                            dataType: 'json',
+                            contentType: 'application/json',
+                            url: conf.endpoint+'/'+ data[identifier]
+                        }).done(function(){
+                            aggiorna_lista();
+                        })
+                    })
+                ));
                 table.find('tbody').append(riga);
+
             }
         };
     } (jQuery));
+    function mostra_lista(data){
+        alert(data);
+    }
 
         $(function () {
-            
             $( "#tabs" ).tabs();
-
             $('button').button();
-
             $('#tab-libri').tabellone({
                 item_name: "Libro",
                 structure: [
+                    {name: "id", title: "Id", type: "hidden"},
                     {name: "title", title: "Titolo", type: "text"},
                     {name: "author", title: "Autore", type: "text"},
                     {name: "pages", title: "Pagine", type: "number"}
-                ]
+                ],
+                endpoint: "http://51.15.160.236:9985/libri"
             });
             $('#tab-auths').tabellone({
                 item_name: "Autore",
@@ -125,7 +186,6 @@
                     {name: "date", title: "Data di nascita", type: "date"}
                 ]
             });
-
             $('#tab-editors').tabellone({
                 item_name: "Editore",
                 structure: [
@@ -152,7 +212,6 @@
             <div id="tab-editors"></div>
         </div>
     </div>
-
 </body>
 
 </html>
