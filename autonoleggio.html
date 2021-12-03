@@ -1,0 +1,169 @@
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"
+    integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.2.1/echarts.min.js"
+    integrity="sha512-17GGcT5BjSbaXG+4Fk3Z1HS1ATXH5oEH060GS3WvSEqGGpkSbRV/amkIWpqOJOIwkBW13QMOBblj8DXnlN7bEA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    <script src="tabellone.plugin.js"></script>
+    <style>
+        body{
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        nav{
+            height: 64px;
+            line-height: 64px;
+            padding-left: 12px;
+            background-color: rgb(129, 184, 255);
+            display: flex;
+        }
+        nav .title {
+            font-size: 1.3em;
+        }
+        nav button{
+            background-color: transparent;
+            border: none;
+        }
+        .container {
+            height: calc(100vh - 64px);
+            display: flex;
+        }
+        .sidebar{
+            height: calc(100vh - 64px);
+            width: 120px;
+            background-color: rgb(129, 184, 255);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar button{
+            background-color: transparent;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            padding-left: 12px
+        }
+        .content{
+            height: calc(100vh - 64px);
+            flex: 1 1 200px;
+            padding: 12px;
+        }
+        .hidden{
+            display:none;
+        }
+        table{
+            width: 100%;
+        }
+    </style>
+    <script>
+        $(function(){
+            $('.nav').click(function(){
+                $('.page').addClass('hidden');
+                $($(this).data('target')).removeClass('hidden');
+            })
+            $('#tab-macchine').tabellone({
+                item_name: "Veicolo",
+                structure: [
+                    {name: "targa", title: "Targa", type: "text"},
+                    {name: "marca", title: "Marca", type: "text"},
+                    {name: "modello", title: "Modello", type: "text"},
+                    {name: "anno", title: "Anno", type: "text"},
+                    {name: "colore", title: "Colore", type: "text"}
+                ],
+                hasDialog: true,
+                endpoint: 'http://51.15.160.236:9067/auto'
+            })
+            $('#tab-clienti').tabellone({
+                item_name: "Cliente",
+                structure: [
+                    {name: "nome", title: "Nome", type: "text"},
+                    {name: "cognome", title: "Cognome", type: "text"},
+                    {name: "patente", title: "Patente", type: "text"},
+                    {name: "data_scadenza", title: "Data scadenza", type: "date"}
+                ],
+                hasDialog: true,
+                endpoint: 'http://51.15.160.236:9067/utente'
+            })
+            $('#tab-noleggi').tabellone({
+                buttons: [{
+                    label: "Noleggia",
+                    action: function(){
+                        const dia = $(this).dialogo("Crea Noleggio",[
+                            {name: "utente", title: "Utente", type: "select", options:"http://51.15.160.236:9067/utente", option_id: x=> x.id, option_label: x => x.nome + ' ' + x.cognome},
+                            {name: "auto", title: "Auto", type: "select", options: "http://51.15.160.236:9067/auto", option_id: (x)=> x.id, option_label: (x) => x.targa + ' ('+ x.marca +')' },
+                            {name: "durata", title: "Durata", type: "number"},
+                        ]);
+                        dia.dialog({
+                            autoOpen: true,
+                            height: 400,
+                            width: 350,
+                            modal: true,
+                            buttons: {
+                                "Aggiungi": function(){
+                                    const msg = {
+                                        utente: $(this).find('[name=utente]').val(),
+                                        auto: $(this).find('[name=auto]').val(),
+                                        durata: $(this).find('[name=durata]').val(),
+                                    }
+                                    console.log(msg);
+                                    $.ajax({
+                                        method: 'POST',
+                                        url: 'http://51.15.160.236:9067/noleggia?'+$.param(msg)
+                                    }).done(function() {
+                                        $(this).dialog('close');
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }],
+                structure: [
+                    {name: x => x.utente.nome, title: "Nome", type: "text"},
+                    {name: x => x.utente.cognome, title: "Cognome", type: "text"},
+                    {name: x => x.auto.targa, title: "Auto", type: "text"},
+                    {name: x => x.auto.marca, title: "Marca", type: "text"},
+                    {name: x => x.auto.modello, title: "Modello", type: "text"},
+                    {name: x => x.inizio, modify: x=> x.split(' ')[0], title: "Inizo", type: "text"},
+                    {name: x => x.fine, title: "Fine", type: "text"},
+                ],
+                hasDialog: false,
+                endpoint: 'http://51.15.160.236:9067/noleggi'
+            })
+        })
+    </script>
+</head>
+
+<body>
+    <nav>
+        <span class="title">Autonoleggio</span>
+    </nav>
+    <div class="container">
+        <aside class="sidebar">
+            <button class="nav" data-target="#macchine">Parco Macchine</button>
+            <button class="nav" data-target="#clienti">Clienti</button>
+            <button class="nav" data-target="#noleggi">Noleggi</button>
+        </aside>
+        <div class="content">
+            <div id="macchine" class="page hidden">
+                <h3>Parco Macchine</h3>
+                <div id="tab-macchine"></div>
+            </div>
+            <div id="clienti" class="page hidden">
+                <h3>Clienti</h3>
+                <div id="tab-clienti"></div>
+            </div>
+            <div id="noleggi" class="page">
+                <h3>Noleggi</h3>
+                <div id="tab-noleggi"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

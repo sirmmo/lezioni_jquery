@@ -9,27 +9,29 @@
         integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.2.1/echarts.min.js" integrity="sha512-17GGcT5BjSbaXG+4Fk3Z1HS1ATXH5oEH060GS3WvSEqGGpkSbRV/amkIWpqOJOIwkBW13QMOBblj8DXnlN7bEA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.2.1/echarts.min.js"
+        integrity="sha512-17GGcT5BjSbaXG+4Fk3Z1HS1ATXH5oEH060GS3WvSEqGGpkSbRV/amkIWpqOJOIwkBW13QMOBblj8DXnlN7bEA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <style>
-        .hidden{
+        .hidden {
             display: none;
         }
 
-        #graph{
+        #graph {
             width: 100%;
             height: 100vh;
         }
     </style>
     <script>
-        $(function(){
+        $(function () {
             $.ajax({
                 method: 'get',
                 url: 'http://51.15.160.236:9076/scheda',
                 dataType: 'json',
                 contentType: 'application/json'
-            }).done(function(data){
-                for (let candidato of data){
+            }).done(function (data) {
+                for (let candidato of data) {
                     const li = $('<li />');
                     li.append($('<input class="radio" type="radio" name="voto" />').val(candidato));
                     li.append($('<span />').text(candidato));
@@ -37,18 +39,18 @@
                 }
             });
 
-            $('#next').click(function(){
+            $('#next').click(function () {
                 $('#identify').addClass('hidden');
                 $.ajax({
-                    method:'get',
+                    method: 'get',
                     dataType: 'json',
                     contentType: 'application/json',
                     url: 'http://51.15.160.236:9076/check',
-                    data:{
+                    data: {
                         id: $('#votante').val()
                     }
-                }).done(function(data){
-                    if(data.canVote){
+                }).done(function (data) {
+                    if (data.canVote) {
                         $('#vote').removeClass('hidden');
                     } else {
                         $('#result').removeClass('hidden');
@@ -57,7 +59,7 @@
                 });
             });
 
-            $('#vota').click(function(){
+            $('#vota').click(function () {
                 $('.errors').addClass('hidden');
                 $.ajax({
                     method: 'post',
@@ -68,8 +70,8 @@
                         "votante": $('#votante').val(),
                         "voto": $(".radio:checked").val()
                     })
-                }).done(function(data){
-                    if (data.errore){
+                }).done(function (data) {
+                    if (data.errore) {
                         $('.errors').removeClass('hidden');
                         $('#msg').text(data.errore)
                     }
@@ -79,17 +81,17 @@
                 });
             });
 
-            function visualizzaGrafico(){
+            function visualizzaGrafico() {
 
                 $.ajax({
                     method: 'get',
                     url: 'http://51.15.160.236:9076/voti',
-                }).done(function(data){
+                }).done(function (data) {
                     var new_data = [];
-                    for (let k in data){
+                    for (let k in data) {
                         new_data.push({
-                           name: k,
-                           value: data[k] 
+                            name: k,
+                            value: data[k]
                         });
                     }
                     var chartDom = document.getElementById('graph');
@@ -103,8 +105,7 @@
                             top: '5%',
                             left: 'center'
                         },
-                        series: [
-                            {
+                        series: [{
                             name: 'Voti Espressi',
                             type: 'pie',
                             radius: ['40%', '70%'],
@@ -120,17 +121,16 @@
                             },
                             emphasis: {
                                 label: {
-                                show: true,
-                                fontSize: '40',
-                                fontWeight: 'bold'
+                                    show: true,
+                                    fontSize: '40',
+                                    fontWeight: 'bold'
                                 }
                             },
                             labelLine: {
                                 show: false
                             },
                             data: new_data
-                            }
-                        ]
+                        }]
                     };
 
                     option && myChart.setOption(option);
@@ -140,6 +140,7 @@
         })
     </script>
 </head>
+
 <body>
     <div id="identify">
         <input id="votante" type="text" name="votante">
@@ -151,7 +152,7 @@
             <span>Errore!</span>
             <span id="msg"></span>
         </div>
-        <ul id="candidati" >
+        <ul id="candidati">
         </ul>
         <button id="vota">Vota</button>
     </div>
@@ -160,4 +161,5 @@
         <div id="graph"></div>
     </div>
 </body>
+
 </html>
