@@ -1,0 +1,106 @@
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"
+    integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.2.1/echarts.min.js"
+    integrity="sha512-17GGcT5BjSbaXG+4Fk3Z1HS1ATXH5oEH060GS3WvSEqGGpkSbRV/amkIWpqOJOIwkBW13QMOBblj8DXnlN7bEA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    <script src="tabellone.plugin.js"></script>
+    <style>
+        body{
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        nav{
+            height: 64px;
+            line-height: 64px;
+            padding-left: 12px;
+            background-color: rgb(129, 184, 255);
+            display: flex;
+        }
+        nav .title {
+            font-size: 1.3em;
+        }
+        nav button{
+            background-color: transparent;
+            border: none;
+        }
+        .container {
+            height: calc(100vh - 64px);
+            display: flex;
+        }
+        .sidebar{
+            height: calc(100vh - 64px);
+            width: 120px;
+            background-color: rgb(129, 184, 255);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar button{
+            background-color: transparent;
+            border: none;
+            text-align: left;
+            cursor: pointer;
+            padding-left: 12px
+        }
+        .content{
+            height: calc(100vh - 64px);
+            flex: 1 1 200px;
+            padding: 12px;
+        }
+        .hidden{
+            display:none;
+        }
+        table{
+            width: 100%;
+        }
+
+        .spacer{
+            flex: 1 1 1px;
+        }
+    </style>
+    <script>
+        $(function(){
+            $('.nav').click(function(){
+                $('.page').addClass('hidden');
+                $($(this).data('target')).removeClass('hidden');
+            })
+            $('#tab-libri').tabellone({
+                item_name: "Libro",
+                structure: [
+                    {name: "tipo", title: "tipo", type: "text"},
+                    {name: "titolo", title: "titolo", type: "text"},
+                    {name: "autore", prepare: x => x.toUpperCase(), title: "autore", type: "text"},
+                    {name: "data_uscita", title: "data uscita", type: "date"},
+                ],
+                hasDialog: true,
+                endpoint: 'http://51.15.160.236:9067/libri'
+            })
+        })
+    </script>
+</head>
+
+<body>
+    <nav>
+        <span class="title">Biblioteca</span>
+    </nav>
+    <div class="container">
+        <aside class="sidebar">
+            <button class="nav" data-target="#libri">Libri</button>
+        </aside>
+        <div class="content">
+            <div id="libri" class="page">
+                <h3>Libri</h3>
+                <div id="tab-libri"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

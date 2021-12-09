@@ -66,7 +66,11 @@
                         var data = {};
                         for (let field of conf.structure) {
                             let input = $(this).find('[name="'+field.name+'"]');
-                            data[field.name] = $(input[0]).val();
+                            if(field.prepare){
+                                data[field.name] = field.prepare($(input[0]).val());
+                            } else {
+                                data[field.name] = $(input[0]).val();
+                            }
                         }
                         if(conf.endpoint){
                             $.ajax({
@@ -125,16 +129,30 @@
         table.append(thead);
         table.append($('<tbody />'));
         this.append(table);
-        function aggiorna_lista(){
+        function aggiorna_lista(page = 1){
                 table.find('tbody').empty();
                 $.ajax({
                     method: 'get',
                     dataType: 'json',
+                    data: {page: page},
                     url: conf.endpoint,
                     success: function (data){
                         console.log(data);
-                        for(let libro of data){
+                        for(let libro of data.items){
                             aggiungi_item(libro, conf.structure)
+                        }
+                        $('#page_num').text(data.page);
+                        $('#page_prev').data('page', data.page-1);
+                        if(data.page-1 <= 0){
+                            $('#page_prev').attr('disabled', true);
+                        } else {
+                            $('#page_prev').attr('disabled', false);
+                        }
+                        $('#page_next').data('page', data.page+1);
+                        if(data.page+1 > data.pages){
+                            $('#page_next').attr('disabled', true);
+                        } else {
+                            $('#page_next').attr('disabled', false);
                         }
                     },
                     error: function(data, status, error) {
@@ -179,7 +197,20 @@
                 })
             ));
             table.find('tbody').append(riga);
-
         }
+        
+
+        const pagination = $("<div />");
+        pagination.append($('<button class="pager" id="page_prev"><</button>'));
+        pagination.append($('<span id="page_num" />'));
+        pagination.append($('<button class="pager" id="page_next">></button>'));
+
+        nav.append($('<span class="spacer" />'));
+        nav.append(pagination);
+
+        $('.pager').click(function(){
+            const goto = $(this).data('page');
+            aggiorna_lista(goto);
+        })
     };
 } (jQuery));
