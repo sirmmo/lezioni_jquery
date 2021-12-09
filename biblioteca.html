@@ -74,13 +74,96 @@
             $('#tab-libri').tabellone({
                 item_name: "Libro",
                 structure: [
-                    {name: "tipo", title: "tipo", type: "text"},
                     {name: "titolo", title: "titolo", type: "text"},
                     {name: "autore", prepare: x => x.toUpperCase(), title: "autore", type: "text"},
                     {name: "data_uscita", title: "data uscita", type: "date"},
                 ],
                 hasDialog: true,
                 endpoint: 'http://51.15.160.236:9067/libri'
+            })
+            $('#tab-riviste').tabellone({
+                item_name: "Rivista",
+                structure: [
+                    {name: "titolo", title: "titolo", type: "text"},
+                    {name: "autore", prepare: x => x.toUpperCase(), title: "autore", type: "text"},
+                    {name: "data_uscita", title: "data uscita", type: "date"},
+                ],
+                hasDialog: true,
+                endpoint: 'http://51.15.160.236:9067/riviste'
+            })
+            $('#tab-link').tabellone({
+                item_name: "Link",
+                structure: [
+                    {name: "titolo", title: "titolo", type: "text"},
+                    {name: "link", title: "URL", type: "text"},
+                    {name: "collegamento", modify: x=>{return $('<a target="_blank" href="'+x.link+'">'+x.titolo+'</a>')}, title: "Collegamento", type: "calculated"},
+                    {name: "popup", modify: x=>{
+                        ret = $('<button id="'+"btn_"+x.id+'">Popup</button>');
+                        ret.click(function(){
+                            alert('hai cliccato sul bottone di '+ x.titolo);
+                        });
+                        return ret;
+                    }, title: "Popup", type: "calculated"},
+                    {name: "descrizione", title: "descrizione", type: "text"},
+                    {name: "formato", title: "formato", type: "text"},
+                ],
+                hasDialog: true,
+                endpoint: 'http://51.15.160.236:9067/link'
+            })
+            $('#tab-utenti').tabellone({
+                item_name: "Utente",
+                structure: [
+                    {name: "nome", title: "nome", type: "text"},
+                    {name: "cognome", title: "cognome", type: "text"},
+                ],
+                hasDialog: true,
+                endpoint: 'http://51.15.160.236:9067/utente'
+            })
+            
+            $('#tab-noleggi').tabellone({
+                buttons: [{
+                    label: "Noleggia",
+                    action: function(){
+                        const dia = $(this).dialogo("Crea Noleggio",[
+                            {name: "utente", title: "Utente", type: "select", options:"http://51.15.160.236:9067/utente", option_id: x=> x.id, option_label: x => x.nome + ' ' + x.cognome},
+                            {name: "risorsa", title: "Risorsa", type: "select", options: {"Libri": "http://51.15.160.236:9067/libri", "Riviste": "http://51.15.160.236:9067/riviste"}, option_id: (x)=> x.id, option_label: (x) => x.titolo },
+                            {name: "durata", title: "Durata", type: "number"},
+                        ]);
+                        dia.dialog({
+                            autoOpen: true,
+                            height: 400,
+                            width: 350,
+                            modal: true,
+                            buttons: {
+                                "Aggiungi": function(){
+                                    const msg = {
+                                        utente: $(this).find('[name=utente]').val(),
+                                        auto: $(this).find('[name=auto]').val(),
+                                        durata: $(this).find('[name=durata]').val(),
+                                    }
+                                    console.log(msg);
+                                    $.ajax({
+                                        method: 'POST',
+                                        url: 'http://51.15.160.236:9067/noleggia?'+$.param(msg)
+                                    }).done(function() {
+                                        $(this).dialog('close');
+                                    });
+                                }
+                            }
+                        });
+                    }
+                }],
+                structure: [
+                    {name: x => x.utente.nome, title: "Nome", type: "text"},
+                    {name: x => x.utente.cognome, title: "Cognome", type: "text"},
+                    {name: x => x.auto.targa, title: "Auto", type: "text"},
+                    {name: x => x.auto.marca, title: "Marca", type: "text"},
+                    {name: x => x.auto.modello, title: "Modello", type: "text"},
+                    {name: x => x.inizio, modify: x=> x.split(' ')[0], title: "Inizo", type: "text"},
+                    {name: x => x.fine, title: "Fine", type: "text"},
+                ],
+                hasDialog: false,
+                endpoint: 'http://51.15.160.236:9067/noleggi'
             })
         })
     </script>
@@ -93,12 +176,36 @@
     <div class="container">
         <aside class="sidebar">
             <button class="nav" data-target="#libri">Libri</button>
+            <button class="nav" data-target="#riviste">Riviste</button>
+            <hr>
+            <button class="nav" data-target="#link">Link</button>
+            <hr>
+            <button class="nav" data-target="#utenti">Utenti</button>
+            <hr>
+            <button class="nav" data-target="#noleggi">Noleggi</button>
         </aside>
         <div class="content">
             <div id="libri" class="page">
                 <h3>Libri</h3>
                 <div id="tab-libri"></div>
             </div>
+            <div id="riviste" class="page hidden">
+                <h3>Riviste</h3>
+                <div id="tab-riviste"></div>
+            </div>
+            <div id="link" class="page hidden">
+                <h3>Link</h3>
+                <div id="tab-link"></div>
+            </div>
+            <div id="utenti" class="page hidden">
+                <h3>Utenti</h3>
+                <div id="tab-utenti"></div>
+            </div>
+            <div id="noleggi" class="page hidden">
+                <h3>Noleggi</h3>
+                <div id="tab-noleggi"></div>
+            </div>
+            
         </div>
     </div>
 </body>

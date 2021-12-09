@@ -5,7 +5,7 @@
             .append($('<p class="validateTips">All form fields are required.</p>'))
             .append($('<form />').append($('<fieldset />')));
         for (let s of conf){
-            if(s.type !== 'hidden' && s.type !== 'select'){
+            if(s.type !== 'hidden' && s.type !== 'select' && s.type !== 'calculated'){
                 ddom.find('fieldset')
                     .append($('<label />')
                         .attr('for', s.name)
@@ -21,19 +21,37 @@
             if(s.type === 'select'){
                 const select = $('<select />')
                     .attr('name', s.name)
-                if(typeof s.options !== 'string'){
+                if(typeof s.options !== 'string' && s.options.lenght){
                     for(let op of s.options){
                         select.append($('<option />').text(op));
                     }
+                } else if (typeof s.options !== 'string' && !s.options.lenght){
+                    for(k in s.options){
+                        og = $("<optgroup label='"+k+"'/>");
+                        $.ajax({
+                            url: s.options[k]+"?ipp=5000",
+                            method: 'get',
+                            dataType: 'json',
+                            contentType: 'application/json',
+                            async: false,
+                        }).done(function(data){
+                            for(let op of data.items){
+                                og.append($('<option />')
+                                    .attr('value', s.option_id(op))
+                                    .text(s.option_label(op)));
+                            }
+                            select.append(og);
+                        })
+                    }
                 } else {
                     $.ajax({
-                        url: s.options,
+                        url: s.options+"?ipp=5000",
                         method: 'get',
                         dataType: 'json',
                         contentType: 'application/json',
                         async: false
                     }).done(function(data){
-                        for(let op of data){
+                        for(let op of data.items){
                             select.append($('<option />')
                                 .attr('value', s.option_id(op))
                                 .text(s.option_label(op)));
@@ -52,6 +70,7 @@
         return ddom;
     }
     $.fn.tabellone = function(conf) {
+        var that = this;
         var nav = $('<nav />');
         if(!conf.hasDialog == false){
             var ddom = this.dialogo('Aggiungi ' + conf.item_name, conf.structure);
@@ -62,6 +81,7 @@
                 modal: true,
                 buttons: {
                     "Aggiungi": function () {
+                        var opendialog = this;
                         console.log(conf.structure);
                         var data = {};
                         for (let field of conf.structure) {
@@ -81,7 +101,7 @@
                                 data: JSON.stringify(data)
                             }).done(function(){
                                 aggiorna_lista();
-                                $(this).dialog("close");
+                                $(opendialog).dialog("close");
                             });
                         } else {
                             aggiungi_item(data, conf.structure);
@@ -106,6 +126,9 @@
                 })
             btn.append($('<i class="fas fa-fw fa-plus"></i>'));
             btn.append($('<span/>').text(conf.item_name));
+            if(!window.navigator.onLine){
+                btn.attr('disabled', true);
+            }
             nav.append(btn);
         }
         if(conf.buttons){
@@ -130,36 +153,61 @@
         table.append($('<tbody />'));
         this.append(table);
         function aggiorna_lista(page = 1){
+                const d_page = this.find('table');
+                if(d_page)
+                    page = d_page;
                 table.find('tbody').empty();
-                $.ajax({
-                    method: 'get',
-                    dataType: 'json',
-                    data: {page: page},
-                    url: conf.endpoint,
-                    success: function (data){
-                        console.log(data);
-                        for(let libro of data.items){
-                            aggiungi_item(libro, conf.structure)
+                if(window.navigator.onLine){
+                    $.ajax({
+                        method: 'get',
+                        dataType: 'json',
+                        data: {page: page},
+                        url: conf.endpoint,
+                        success: function (data){
+                            localStorage.setItem($(that).attr('id'), JSON.stringify(data));
+                            console.log(data);
+                            for(let libro of data.items){
+                                aggiungi_item(libro, conf.structure)
+                            }
+                            that.find('#page_num').text(data.page);
+                            that.find('#page_prev').data('page', data.page-1);
+                            if(data.page-1 <= 0){
+                                that.find('#page_prev').attr('disabled', true);
+                            } else {
+                                that.find('#page_prev').attr('disabled', false);
+                            }
+                            that.find('#page_next').data('page', data.page+1);
+                            if(data.page+1 > data.pages){
+                                that.find('#page_next').attr('disabled', true);
+                            } else {
+                                that.find('#page_next').attr('disabled', false);
+                            }
+                        },
+                        error: function(data, status, error) {
+                            console.log(data);
+                            console.log(status, error);
                         }
-                        $('#page_num').text(data.page);
-                        $('#page_prev').data('page', data.page-1);
-                        if(data.page-1 <= 0){
-                            $('#page_prev').attr('disabled', true);
-                        } else {
-                            $('#page_prev').attr('disabled', false);
-                        }
-                        $('#page_next').data('page', data.page+1);
-                        if(data.page+1 > data.pages){
-                            $('#page_next').attr('disabled', true);
-                        } else {
-                            $('#page_next').attr('disabled', false);
-                        }
-                    },
-                    error: function(data, status, error) {
-                        console.log(data);
-                        console.log(status, error);
+                    })
+                } else {
+                    data = JSON.parse(localStorage.getItem($(that).attr('id')));
+                    console.log(data);
+                    for(let libro of data.items){
+                        aggiungi_item(libro, conf.structure)
                     }
-                })
+                    that.find('#page_num').text(data.page);
+                    that.find('#page_prev').data('page', data.page-1);
+                    if(data.page-1 <= 0){
+                        that.find('#page_prev').attr('disabled', true);
+                    } else {
+                        that.find('#page_prev').attr('disabled', false);
+                    }
+                    that.find('#page_next').data('page', data.page+1);
+                    if(data.page+1 > data.pages){
+                        that.find('#page_next').attr('disabled', true);
+                    } else {
+                        that.find('#page_next').attr('disabled', false);
+                    }
+                }
             
         }
         
@@ -170,16 +218,22 @@
             let identifier = null;
             for (let s of structure){
                 if (s.type !== 'hidden') {
-                    let text = "";
-                    if(typeof s.name === 'string'){
-                        text = data[s.name];
-                    } else {
-                        text = s.name(data);
-                    }
+                    if(s.type !== 'calculated') {
+                        let text = "";
+                        if(typeof s.name === 'string'){
+                            text = data[s.name];
+                        } else {
+                            text = s.name(data);
+                        }
 
-                    if(s.modify)
-                        text = s.modify(text);
-                    riga.append($('<td></td>').text(text));
+                        if(s.modify)
+                            text = s.modify(text);
+                        riga.append($('<td></td>').text(text));
+                    } else {
+                        if(s.modify)
+                            field = s.modify(data);
+                        riga.append($('<td></td>').append(field));
+                    }
                 } else { 
                     identifier = s.name;
                 }
@@ -208,9 +262,15 @@
         nav.append($('<span class="spacer" />'));
         nav.append(pagination);
 
-        $('.pager').click(function(){
+        this.find('.pager').click(function(){
             const goto = $(this).data('page');
+            that.find('table').data('page', goto);
             aggiorna_lista(goto);
         })
+
+        if(!window.navigator.onLine){
+            that.find('#page_prev').attr('disabled', true);
+            that.find('#page_next').attr('disabled', true);
+        }
     };
 } (jQuery));
