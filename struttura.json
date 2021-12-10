@@ -99,6 +99,12 @@
             "type": "load",
             "url": "http://51.15.160.236:9935/info.json"
         }
+    }, {
+        "id": "load_3",
+        "content":{
+            "type": "loadxml",
+            "url": "https://www.ansa.it/sito/ansait_rss.xml"
+        }
     }],
     "vnav": {
         "visible": true,
